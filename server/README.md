@@ -37,7 +37,7 @@ The ingestion pipeline indexes `docs/`, `analysis/`, `organizing-guides/`, and `
    ```bash
    REVOLUTION_HTTP_ENABLE=true npm start
    ```
-   The server listens on `http://0.0.0.0:3000/mcp` by default. Override host/port with env vars below. MCP clients supporting Streamable HTTP can POST JSON-RPC requests and optionally open an SSE stream via `GET /mcp`.
+   The server listens on `http://0.0.0.0:3000/mcp` by default (Vercel rewrite `/mcp` → `/api/mcp`). Override host/port with env vars below. MCP clients supporting Streamable HTTP can POST JSON-RPC requests and optionally open an SSE stream via `GET /mcp`.
 
    Example initialization request with `curl`:
    ```bash
