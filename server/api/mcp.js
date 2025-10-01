@@ -34,6 +34,22 @@ export default async function handler(req, res) {
       req.headers.accept = Array.from(values).join(", ");
     }
 
+    if (req.method === "GET") {
+      res.statusCode = 405;
+      res.setHeader("Content-Type", "application/json");
+      res.end(
+        JSON.stringify({
+          jsonrpc: "2.0",
+          error: {
+            code: -32000,
+            message: "GET not supported in stateless mode"
+          },
+          id: null
+        })
+      );
+      return;
+    }
+
     const streamableTransport = await ensureServer();
     await streamableTransport.handleRequest(req, res);
   } catch (error) {
