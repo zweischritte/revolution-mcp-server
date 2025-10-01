@@ -1,68 +1,23 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import http from "node:http";
 import { randomUUID } from "node:crypto";
 
-import { loadCatalog } from "./catalog/index.js";
-import { createCatalogIndex } from "./catalog/search.js";
-import { createVectorIndex } from "./retrieval/vectorIndex.js";
-import { loadConfig } from "./config.js";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+
+import { createServerInstance, getBootstrap } from "./bootstrap.js";
 import { logger } from "./logger.js";
-import { FlowNexusAdapter } from "./memory/flowNexusAdapter.js";
-import type { ServerState } from "./state.js";
-import { registerTools } from "./tools/index.js";
-
-async function createServerInstance(state: ServerState, name: string, version: string) {
-  const server = new McpServer({
-    name,
-    version,
-    description: "Revolution knowledge base MCP server"
-  });
-
-  await registerTools(server, state);
-  return server;
-}
 
 async function main(): Promise<void> {
-  const config = loadConfig();
+  const { config, state } = await getBootstrap();
 
-  logger.info(`Bootstrapping ${config.name} v${config.version}`);
-
-  const catalogResult = await loadCatalog(config.knowledgeBasePath);
-  if (catalogResult.warnings.length > 0) {
-    catalogResult.warnings.forEach((warning) => logger.warn(warning));
-  }
-
-  const flowNexusConfig = {
-    namespace: config.memoryNamespace,
-    knowledgeBasePath: config.knowledgeBasePath,
-    ...(config.memoryGuideRelativePath ? { memoryGuideRelativePath: config.memoryGuideRelativePath } : {}),
-    ...(config.flowNexusBaseUrl ? { baseUrl: config.flowNexusBaseUrl } : {}),
-    ...(config.flowNexusApiKey ? { apiKey: config.flowNexusApiKey } : {})
-  } as const;
-
-  const flowNexus = new FlowNexusAdapter(flowNexusConfig);
-  const memoryKeys = await flowNexus.loadAll();
-
-  const catalogIndex = createCatalogIndex(catalogResult.items);
-  const vectorIndex = createVectorIndex();
-  await vectorIndex.upsert(catalogResult.items);
-
-  const state: ServerState = {
-    catalog: catalogResult.items,
-    catalogIndex,
-    vectorIndex,
-    flowNexus,
-    memoryKeys
-  };
-
-  const stdioServer = await createServerInstance(state, config.name, config.version);
+  const stdioServer: McpServer = await createServerInstance(state, config);
   const stdioTransport = new StdioServerTransport();
   await stdioServer.connect(stdioTransport);
+  logger.info("Stdio MCP transport ready");
 
   if (config.enableHttp) {
-    const httpServerInstance = await createServerInstance(state, config.name, config.version);
+    const httpServerInstance = await createServerInstance(state, config);
     const streamableTransport = new StreamableHTTPServerTransport({
       sessionIdGenerator: () => randomUUID(),
       enableJsonResponse: true
