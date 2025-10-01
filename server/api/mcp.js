@@ -24,6 +24,16 @@ async function ensureServer() {
 
 export default async function handler(req, res) {
   try {
+    const accept = req.headers.accept ?? "";
+    const needsJson = !accept.includes("application/json");
+    const needsSse = !accept.includes("text/event-stream");
+    if (needsJson || needsSse) {
+      const values = new Set(
+        [accept, "application/json", "text/event-stream"].filter(Boolean)
+      );
+      req.headers.accept = Array.from(values).join(", ");
+    }
+
     const streamableTransport = await ensureServer();
     await streamableTransport.handleRequest(req, res);
   } catch (error) {

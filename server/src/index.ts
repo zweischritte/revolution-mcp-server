@@ -32,6 +32,18 @@ async function main(): Promise<void> {
       logger.error(`HTTP transport error: ${(error as Error).message}`);
     };
 
+    const ensureAcceptHeaders = (req: http.IncomingMessage) => {
+      const accept = req.headers.accept ?? "";
+      const needsJson = !accept.includes("application/json");
+      const needsSse = !accept.includes("text/event-stream");
+      if (needsJson || needsSse) {
+        const values = new Set(
+          [accept, "application/json", "text/event-stream"].filter(Boolean)
+        );
+        req.headers.accept = Array.from(values).join(", ");
+      }
+    };
+
     const nodeServer = http.createServer(async (req, res) => {
       try {
         if (!req.url) {
@@ -49,7 +61,14 @@ async function main(): Promise<void> {
           return;
         }
 
-        if (req.method === "POST" || req.method === "GET" || req.method === "DELETE") {
+        if (req.method === "POST" || req.method === "DELETE") {
+          ensureAcceptHeaders(req);
+          await streamableTransport.handleRequest(req, res);
+          return;
+        }
+
+        if (req.method === "GET") {
+          ensureAcceptHeaders(req);
           await streamableTransport.handleRequest(req, res);
           return;
         }
