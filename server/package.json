@@ -1,0 +1,36 @@
+{
+  "name": "revolution-mcp-server",
+  "version": "0.1.0",
+  "description": "Model Context Protocol server exposing the Revolution knowledge base",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "nodemon --watch src --exec ts-node src/index.ts",
+    "lint": "echo 'linting not yet configured'",
+    "test": "tsx tests/smoke.test.ts",
+    "test:watch": "tsx watch tests/smoke.test.ts",
+    "call-tool": "tsx scripts/call-tool.ts"
+  },
+  "keywords": [
+    "mcp",
+    "revolution",
+    "knowledge"
+  ],
+  "author": "Revolution MCP Team",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.18.2",
+    "dotenv": "^17.2.3",
+    "winston": "^3.18.3",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.19",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  },
+  "type": "module"
+}
