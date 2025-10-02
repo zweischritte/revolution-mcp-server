@@ -47,7 +47,8 @@ async function buildBootstrap(): Promise<BootstrapResult> {
     catalogIndex,
     vectorIndex,
     flowNexus,
-    memoryKeys
+    memoryKeys,
+    knowledgeBasePath: config.knowledgeBasePath
   };
 
   return { config, state, warnings: catalogResult.warnings };

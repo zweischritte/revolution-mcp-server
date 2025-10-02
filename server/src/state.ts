@@ -9,4 +9,5 @@ export interface ServerState {
   vectorIndex: VectorIndex;
   flowNexus: FlowNexusAdapter;
   memoryKeys: MemoryKeyMap;
+  knowledgeBasePath: string;
 }

@@ -2,6 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ServerState } from "../state.js";
 import { registerMemoryTools } from "./memoryTools.js";
 import { registerTheoryTools } from "./theoryTools.js";
+import { registerDocumentTools } from "./documentTools.js";
 
 /**
  * Register core MCP tools. Additional tools will be added incrementally as
@@ -10,6 +11,7 @@ import { registerTheoryTools } from "./theoryTools.js";
 export async function registerTools(server: McpServer, state: ServerState): Promise<void> {
   registerMemoryTools(server, state);
   registerTheoryTools(server, state);
+  registerDocumentTools(server, state);
   server.registerTool(
     "revolution__ping",
     {
