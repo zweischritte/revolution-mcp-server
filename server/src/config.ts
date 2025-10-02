@@ -1,4 +1,5 @@
 import path from "node:path";
+import { existsSync } from "node:fs";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -43,10 +44,15 @@ export function loadConfig(): ServerConfig {
   const httpPort = process.env.REVOLUTION_HTTP_PORT ? Number(process.env.REVOLUTION_HTTP_PORT) : undefined;
   const httpHost = process.env.REVOLUTION_HTTP_HOST;
 
+  const resolvedBase = path.resolve(baseDir);
+  if (!existsSync(resolvedBase)) {
+    throw new Error(`Knowledge base path not found: ${resolvedBase}`);
+  }
+
   return {
     name: process.env.REVOLUTION_MCP_NAME ?? DEFAULT_NAME,
     version: process.env.REVOLUTION_MCP_VERSION ?? DEFAULT_VERSION,
-    knowledgeBasePath: baseDir,
+    knowledgeBasePath: resolvedBase,
     memoryNamespace: process.env.REVOLUTION_MEMORY_NAMESPACE ?? DEFAULT_NAMESPACE,
     ...(flowNexusBaseUrl ? { flowNexusBaseUrl } : {}),
     ...(flowNexusApiKey ? { flowNexusApiKey } : {}),
