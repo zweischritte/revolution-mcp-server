@@ -20,6 +20,7 @@ The ingestion pipeline indexes `docs/`, `analysis/`, `organizing-guides/`, and `
 ---
 
 ## Quick Start (for LLM agents/clients)
+> Tip: on Vercel, set project root to `server/` and enable HTTP via `REVOLUTION_HTTP_ENABLE=true`.
 1. **Install dependencies**
    ```bash
    cd server
@@ -37,7 +38,7 @@ The ingestion pipeline indexes `docs/`, `analysis/`, `organizing-guides/`, and `
    ```bash
    REVOLUTION_HTTP_ENABLE=true npm start
    ```
-   The server listens on `http://0.0.0.0:3000/mcp` by default (Vercel rewrite `/mcp` → `/api/mcp`). Override host/port with env vars below. MCP clients supporting Streamable HTTP can POST JSON-RPC requests and optionally open an SSE stream via `GET /mcp`.
+   The server listens on `http://0.0.0.0:3000/mcp` by default. Override host/port with env vars below. MCP clients supporting Streamable HTTP can POST JSON-RPC requests and optionally open an SSE stream via `GET /mcp`.
 
    Example initialization request with `curl`:
    ```bash
@@ -58,7 +59,7 @@ Environment variables (optional):
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `REVOLUTION_KB_PATH` | Knowledge base root. | Parent directory |
+| `REVOLUTION_KB_PATH` | Knowledge base root. | `./knowledge-base` |
 | `REVOLUTION_MEMORY_NAMESPACE` | Flow Nexus namespace. | `revolution` |
 | `REVOLUTION_MEMORY_GUIDE_PATH` | Path to memory guide Markdown. | `docs/MEMORY-STRUCTURE-GUIDE.md` |
 | `REVOLUTION_MCP_NAME` | Server name advertised to clients. | `revolution-mcp-server` |
@@ -97,6 +98,7 @@ Run with `npm test`.
 ## Folder Structure
 ```
 server/
+├── knowledge-base/       # docs/, analysis/, organizing-guides/, additional-sources/, memory/
 ├── dist/                 # build output (after npm run build)
 ├── scripts/              # helper scripts (call-tool)
 ├── src/

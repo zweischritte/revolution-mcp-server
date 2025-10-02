@@ -34,7 +34,8 @@ const DEFAULT_NAMESPACE = "revolution";
  * Load configuration from environment variables with reasonable defaults.
  */
 export function loadConfig(): ServerConfig {
-  const baseDir = process.env.REVOLUTION_KB_PATH ?? path.resolve("..");
+  const defaultKnowledgeBase = path.resolve(process.cwd(), "knowledge-base");
+  const baseDir = process.env.REVOLUTION_KB_PATH ?? defaultKnowledgeBase;
   const flowNexusBaseUrl = process.env.FLOW_NEXUS_BASE_URL;
   const flowNexusApiKey = process.env.FLOW_NEXUS_API_KEY;
   const memoryGuideRelativePath = process.env.REVOLUTION_MEMORY_GUIDE_PATH;

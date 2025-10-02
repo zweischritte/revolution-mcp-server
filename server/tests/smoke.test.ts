@@ -26,7 +26,10 @@ process.on('unhandledRejection', (reason) => {
   const config = loadConfig();
   assert.equal(config.name, process.env.REVOLUTION_MCP_NAME ?? "revolution-mcp-server");
   assert.equal(config.memoryNamespace, process.env.REVOLUTION_MEMORY_NAMESPACE ?? "revolution");
-  assert.equal(path.resolve(config.knowledgeBasePath), path.resolve(".."));
+  const expectedKnowledgeBase = process.env.REVOLUTION_KB_PATH
+    ? path.resolve(process.env.REVOLUTION_KB_PATH)
+    : path.resolve(process.cwd(), "knowledge-base");
+  assert.equal(path.resolve(config.knowledgeBasePath), expectedKnowledgeBase);
 
   const catalog = await loadCatalog(config.knowledgeBasePath);
   assert.ok(catalog.items.length > 0, "Catalog should contain knowledge base entries");

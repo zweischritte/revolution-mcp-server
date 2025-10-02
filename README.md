@@ -3,8 +3,8 @@
 This repository contains the Revolution knowledge corpus and the accompanying Model Context Protocol (MCP) server implementation.
 
 ## Structure
-- `docs/`, `analysis/`, `organizing-guides/`, `additional-sources/`, `memory/`: knowledge base consumed by the MCP server.
-- `server/`: TypeScript MCP server exposing the knowledge base via stdio and Streamable HTTP.
+- `server/knowledge-base/`: knowledge corpus (docs, analysis, organizing-guides, additional-sources, memory).
+- `server/`: TypeScript MCP server exposing the corpus via stdio and Streamable HTTP.
 
 ## Local Usage
 ```bash
