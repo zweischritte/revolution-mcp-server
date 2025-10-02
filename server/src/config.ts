@@ -1,5 +1,6 @@
 import path from "node:path";
 import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -35,8 +36,21 @@ const DEFAULT_NAMESPACE = "revolution";
  * Load configuration from environment variables with reasonable defaults.
  */
 export function loadConfig(): ServerConfig {
-  const defaultKnowledgeBase = path.resolve(process.cwd(), "knowledge-base");
-  const baseDir = process.env.REVOLUTION_KB_PATH ?? defaultKnowledgeBase;
+  const candidatePaths: string[] = [];
+
+  if (process.env.REVOLUTION_KB_PATH) {
+    candidatePaths.push(path.resolve(process.env.REVOLUTION_KB_PATH));
+  }
+
+  candidatePaths.push(path.resolve(process.cwd(), "knowledge-base"));
+  const thisDir = path.dirname(fileURLToPath(import.meta.url));
+  candidatePaths.push(path.resolve(thisDir, "../knowledge-base"));
+
+  const knowledgeBasePath = candidatePaths.find((candidate) => existsSync(candidate));
+  if (!knowledgeBasePath) {
+    throw new Error(`Knowledge base path not found. Tried: ${candidatePaths.join(", ")}`);
+  }
+
   const flowNexusBaseUrl = process.env.FLOW_NEXUS_BASE_URL;
   const flowNexusApiKey = process.env.FLOW_NEXUS_API_KEY;
   const memoryGuideRelativePath = process.env.REVOLUTION_MEMORY_GUIDE_PATH;
@@ -44,15 +58,10 @@ export function loadConfig(): ServerConfig {
   const httpPort = process.env.REVOLUTION_HTTP_PORT ? Number(process.env.REVOLUTION_HTTP_PORT) : undefined;
   const httpHost = process.env.REVOLUTION_HTTP_HOST;
 
-  const resolvedBase = path.resolve(baseDir);
-  if (!existsSync(resolvedBase)) {
-    throw new Error(`Knowledge base path not found: ${resolvedBase}`);
-  }
-
   return {
     name: process.env.REVOLUTION_MCP_NAME ?? DEFAULT_NAME,
     version: process.env.REVOLUTION_MCP_VERSION ?? DEFAULT_VERSION,
-    knowledgeBasePath: resolvedBase,
+    knowledgeBasePath: knowledgeBasePath,
     memoryNamespace: process.env.REVOLUTION_MEMORY_NAMESPACE ?? DEFAULT_NAMESPACE,
     ...(flowNexusBaseUrl ? { flowNexusBaseUrl } : {}),
     ...(flowNexusApiKey ? { flowNexusApiKey } : {}),
